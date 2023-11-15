@@ -64,5 +64,6 @@ public class Programmers_보행자천국 {
     boolean noRouteTo(int i, int j, int[][][] route){
         return route[i][j][RIGHT] + route[i][j][DOWN] == 0 ? true : false;
     }
+
 }
 

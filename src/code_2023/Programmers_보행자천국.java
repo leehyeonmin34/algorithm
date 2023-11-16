@@ -2,6 +2,10 @@ package code_2023;
 
 // https://school.programmers.co.kr/learn/courses/30/lessons/1832?language=java
 
+import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.function.Function;
+
 public class Programmers_보행자천국 {
 
     public static void main(String[] args) {
@@ -23,7 +27,7 @@ public class Programmers_보행자천국 {
         int[][] map = new int[m + 1][n + 1];
         for(int j = 1; j <= n; j++){
             for(int i = 1; i <= m; i++){
-                map[i][j] = map[i - 1][j - 1];
+                map[i][j] = cityMap[i - 1][j - 1];
             }
         }
 
@@ -32,12 +36,13 @@ public class Programmers_보행자천국 {
             for(int i = 1; i < m; i++){
                 int routeToUp = routeNumTo(i - 1, j, map, route);
                 int routeToLeft = routeNumTo(i, j -1, map, route);
-                route[i][j][RIGHT] = routeToLeft == 0 ? 0 : routeToLeft + 1;
-                route[i][j][DOWN] = routeToUp == 0 ? 0 : routeToUp + 1;
+
+                route[i][j][RIGHT] = routeToLeft == 0 && i != 1 && j != 2 ? 0 : routeToLeft + 1;
+                route[i][j][DOWN] = routeToUp == 0  && i != 2 && j != 1 ? 0 : routeToUp + 1;
             }
         }
-
-        return map[m][n] % MOD;
+        System.out.println(Arrays.deepToString(route));
+        return routeNumTo(m, n, map, route) % MOD;
     }
 
     int routeNumTo(int i, int j, int[][] map, int[][][] route){
@@ -57,13 +62,14 @@ public class Programmers_보행자천국 {
             if (direction == RIGHT) {
                 return map[i][j - 1] == 1 ? route[i][j - 1][RIGHT] : 0;
             }
-            else return route[i - 1][j][DOWN];
+            else return route[i - 1][j][DOWN] ;
         }
     }
 
     boolean noRouteTo(int i, int j, int[][][] route){
         return route[i][j][RIGHT] + route[i][j][DOWN] == 0 ? true : false;
     }
+
 
 }
 

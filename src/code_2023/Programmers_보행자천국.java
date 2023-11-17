@@ -16,7 +16,7 @@ public class Programmers_보행자천국 {
     final int VALID_SIGN = 0;
     final int UNTURNABLE_SIGN = 2;
 
-    int solution(int m, int n, int[][] cityMap) {
+    private int solution(int m, int n, int[][] cityMap) {
         int[][][] route = new int[m + 1][n + 1][2];
 
         // 제일 윗줄부터 왼쪽에서 오른쪽으로 경로수를 찾아나감

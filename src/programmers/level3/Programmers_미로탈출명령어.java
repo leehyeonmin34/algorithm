@@ -1,4 +1,4 @@
-package code_2023;
+package programmers.level3;
 
 public class Programmers_미로탈출명령어 {
 

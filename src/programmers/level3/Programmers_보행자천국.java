@@ -1,4 +1,4 @@
-package code_2023;
+package programmers.level3;
 
 // https://school.programmers.co.kr/learn/courses/30/lessons/1832?language=java
 

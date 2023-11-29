@@ -35,6 +35,10 @@ def solution(alp, cop, problems):
         if curr_alp >= max_alp and curr_cop >= max_cop:
             return curr_cost
 
+        # 이미 해당 지점(curr_alp, curr_cop)을 다른 최단경로가 방문했다면 무시
+        if table[curr_alp][curr_cop] < curr_cost:
+            continue
+
         # 다음으로 풀 문제가 table의 값인 최소 cost를 갱신할 수 있다면 힙에 넣기
         # 풀 문제가 없다면 코딩력, 알고력을 공부할게 될 것임 (problems에 추가해놓았으니)
         for r_alp, r_cop, a_alp, a_cop, n_cost in problems:
@@ -42,6 +46,9 @@ def solution(alp, cop, problems):
             if curr_alp >= r_alp and curr_cop >= r_cop and curr_cost + n_cost < table[n_alp][n_cop]:
                 table[n_alp][n_cop] = curr_cost + n_cost
                 heapq.heappush(h, (curr_cost + n_cost, n_alp, n_cop))
+
+
+
 
 param11, param12, param13 = 10, 10, [[10,15,2,1,2],[20,20,3,3,4]]
 param21, param22, param23 = 0,0,[[0,0,2,1,2],[4,5,3,1,2],[4,11,4,0,2],[10,4,0,4,2]]

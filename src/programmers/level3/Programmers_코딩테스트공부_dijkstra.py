@@ -13,39 +13,54 @@
 # alp cop, 각각 알고력 코딩력
 # problems 문제정보 담은 2차원배열 (100개 이하)
 # [필요 알고력, 팔요 코딩력, 보상 알고력, 보상 코딩력, 소요시간]
-import sys
-import collections
 
 import heapq
 
-def solution(alp, cop, problems):
-    max_alp, max_cop = max(x[0] for x in problems), max(x[1] for x in problems)
 
-    problems += [[0, 0, 1, 0, 1], [0, 0, 0, 1, 1]]
+def solution(alp: int, cop: int, problems: list):
+    problems.append([0, 0, 1, 0, 1]) # 알고력 +1
+    problems.append([0, 0, 0, 1, 1]) # 코딩력 +1
 
-    table = [[int(1e9) for _ in range(151)] for _ in range(151)]
-    table[alp][cop] = 0
+    ALP_REQ, COP_REQ, ALP_RWD, COP_RWD, COST = range(5)
+    MAX_ALP = max(alp, max([p[ALP_REQ] for p in problems]))
+    MAX_COP = max(cop, max([p[COP_REQ] for p in problems]))
 
-    h = [(0, alp, cop)]
-    while h:
-        # cost 제일 적은 거 추출
-        curr_cost, curr_alp, curr_cop = heapq.heappop(h)
+    # costs[alp][cop] = (alp,cop)의 실력을 갖기 위한 최소 cost
+    costs = [[float("inf")] * (MAX_COP + 1) for _ in range(MAX_ALP + 1)]
+    costs[alp][cop] = 0
+    q = [[0, alp, cop]]
 
-        # 최고 문제 풀수 있으면 끝
-        if curr_alp >= max_alp and curr_cop >= max_cop:
+    while q:
+        curr_cost, curr_alp, curr_cop = heapq.heappop(q)
+
+        # 최대 알고력, 코딩력에 도달했다면 그게 최솟값이므로 반환
+        if curr_alp >= MAX_ALP and curr_cop >= MAX_COP:
             return curr_cost
 
-        # 이미 해당 지점(curr_alp, curr_cop)을 다른 최단경로가 방문했다면 무시
-        if table[curr_alp][curr_cop] < curr_cost:
+        # 이미 방문한 지점이라면 중지
+        if costs[curr_alp][curr_cop] < curr_cost:
             continue
 
-        # 다음으로 풀 문제가 table의 값인 최소 cost를 갱신할 수 있다면 힙에 넣기
-        # 풀 문제가 없다면 코딩력, 알고력을 공부할게 될 것임 (problems에 추가해놓았으니)
-        for r_alp, r_cop, a_alp, a_cop, n_cost in problems:
-            n_alp, n_cop = min(150, curr_alp + a_alp), min(150, curr_cop + a_cop)
-            if curr_alp >= r_alp and curr_cop >= r_cop and curr_cost + n_cost < table[n_alp][n_cop]:
-                table[n_alp][n_cop] = curr_cost + n_cost
-                heapq.heappush(h, (curr_cost + n_cost, n_alp, n_cop))
+        # [*중요*]
+        # 이 지점에서 costs[curr_alp][curr_cop] = curr_cost로 지정하는 것보다,
+        # 아래 heapq에 넣기 전에 지정하는 게 훨씬 더 빠름
+
+        for p in problems:
+            alp_req, cop_req, alp_rwd, cop_rwd, cost = p
+
+            # 문제 p를 풀 수 있다면 풀어버린 경우를 q에 넣자
+            if alp_req <= curr_alp and cop_req <= curr_cop:
+                next_alp = min(MAX_ALP, curr_alp + alp_rwd)
+                next_cop = min(MAX_COP, curr_cop + cop_rwd)
+                next_cost = curr_cost + cost
+
+                # [*중요*]
+                # 여기서도 이미 방문한 지점이면 중지하는 if문을 넣으면 훨씬 빠르다.
+                # 아무래도 힙에서 추출하려면 logN 시간이 필요하기 때문에, 힙에 뭔가를 최대한 안 넣게 되기 때문인 것 같다.
+                # 여기서 costs값 갱신
+                if costs[next_alp][next_cop] > next_cost:
+                    costs[next_alp][next_cop] = next_cost
+                    heapq.heappush(q, [next_cost, next_alp, next_cop])
 
 
 

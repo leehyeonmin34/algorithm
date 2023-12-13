@@ -64,6 +64,10 @@ def solution(board, r, c):
             unopened[char].append([i, j])
             enter += 1
 
+    print(unopened)
+    print(list(itertools.permutations(filter(lambda v: v, [cards for cards in unopened]))))
+
+    # 캐릭터들을 회수하는 최소비용을 다익스트라로 구함
     q = [[0, unopened, board, [r, c]]]
     while q:
         cost, unopened, board, curr = heapq.heappop(q)
@@ -72,7 +76,6 @@ def solution(board, r, c):
         if no_card_left(unopened):
             return cost + enter
 
-        # 남은 캐릭터들을 회수하는 최소비용을 다익스트라로 구함
         for character, char_cards in enumerate(unopened):
 
             # 해당 캐릭터카드 찾을 필요 없으면 다음으로
@@ -92,7 +95,7 @@ def solution(board, r, c):
             n_unopened = copy.deepcopy(unopened)
             n_unopened[character] = []
 
-            # 힙에 추가
+            # 힙에 추가. 최소비용이 더 크더라도 종료시 커서 위치가 다르기 때문에 둘 다 추가함.
             heapq.heappush(q, [cost + cost1, n_unopened, n_board, card2])
             heapq.heappush(q, [cost + cost2, n_unopened, n_board, card1])
 

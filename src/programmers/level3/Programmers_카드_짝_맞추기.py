@@ -72,6 +72,7 @@ def solution(board, r, c):
         if no_card_left(unopened):
             return cost + enter
 
+        # 남은 캐릭터들을 회수하는 최소비용을 다익스트라로 구함
         for character, char_cards in enumerate(unopened):
 
             # 해당 캐릭터카드 찾을 필요 없으면 다음으로

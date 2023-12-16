@@ -5,28 +5,28 @@ import bisect, math
 
 
 def solution(k, room_number):
+    k = min(k, max(room_number) + len(room_number) + 10)
+
     answer = []
-    TOTAL_EXP = int(math.log10(k)) if k % 10 == 0 else int(math.log10(k)) + 1
-    SIZE_EXP = TOTAL_EXP // 2
+    TOTAL_EXP = int(math.log2(k)) + 1
+    SIZE_EXP = TOTAL_EXP * 4 // 5
     PAGE_EXP = TOTAL_EXP - SIZE_EXP
-    PAGE_NUM = 10 ** PAGE_EXP
-    SIZE = 10 ** SIZE_EXP
+    PAGE_NUM = 2 ** PAGE_EXP
+    SIZE = 2 ** SIZE_EXP
 
     # PAGE_NUM = 10
     # SIZE = 1
 
     rooms = [[i + 1 for i in range(j * SIZE, (j + 1) * SIZE)] for j in range(PAGE_NUM)]
-    # print(rooms)
 
     for num in room_number:
         page_idx = num // SIZE if num % SIZE != 0 else num // SIZE - 1
-        while not rooms[page_idx] or (idx:= bisect.bisect_left(rooms[page_idx], num)) == len(rooms[page_idx]):
+        while not rooms[page_idx] or rooms[page_idx][-1] < num:
             page_idx += 1
+        idx = bisect.bisect_left(rooms[page_idx], num)
         page = rooms[page_idx]
         answer.append(page[idx])
         page.pop(idx)
-        # print(num, page_idx, idx, page)
-
 
     return answer
 

@@ -5,7 +5,6 @@
 # 섭취할 음식 없다면 -1 리턴
 
 import bisect
-
 def solution(food_times, k):
     TIME, INDEX = 0, 1
     N = len(food_times)

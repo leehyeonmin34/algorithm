@@ -1,45 +1,87 @@
 import collections
 
-
-class Node:
-
-    def __init__(self):
-        self.children = collections.defaultdict()
-        self.is_word = False
-
-
+# 노드를 활용해서 이것저것 시도해봤지만,
+# 그래프만으로 하는 게 노드 활용하는 것보다 성능 2배 좋음
 def solution(words):
-    root = Node(None)
-    for word in words:
-        node = root
-        for char in word:
-            if char in node.children:
-                next = node.children[char]
-            else:
-                next = Node()
-                node.children[char] = next
-            node = next
-        node.is_word = True
 
-    # 탐색방법 1
-    # dfs방식으로 load == 1인 지점, is_word인 부분만 m을 추가시킴
-    # O(M * N) 단어길이 M, 단어갯수 N
+    # 각 노드가 딕셔너리로서 표현되며,
+    # 해당 노드의 일반 자식은 char key를 갖고,
+    # 속성값은 DUP, END 같은 별도의 key를 갖는다.
+    DUP, END = "DUP", "END"
+
+    # 트라이 그래프 생성
+    root = collections.defaultdict()
+    for word in words:
+        curr = root
+        for char in word:
+            if char not in curr:
+                curr[char] = collections.defaultdict()
+            curr = curr[char]
+            curr[DUP] = 1 if DUP not in curr else curr[DUP] + 1
+
+        curr[END] = True
+
+    # dfs로 가지쳐지는 부분이나 단어가 끝나는 부분 탐색
     sum = 0
     s = [[root, 0]]
     while s:
-        node, m = s.pop()
-        if len(node.children) == 1:
+        curr, m = s.pop()
+
+        # 중복이 1인 곳(더 이상 탐색 필요 X)
+        if DUP in curr and curr[DUP] == 1:
             sum += m
             continue
 
-        sum += m if node.is_word else 0
+        # 단어가 끝나는 부분
+        sum += m if END in curr else 0
 
-        for key, next in node.children.items():
-            s.append([next, m + 1])
+        # 자식 노드들 추가
+        for key, next in curr.items():
+            if key not in [DUP, END]:
+                s.append([next, m + 1])
 
     return sum
 
-# 탐색방법 2
+
+# 노드 활용
+# class Node:
+#
+#     def __init__(self):
+#         self.children = collections.defaultdict()
+#         self.is_word = False
+#
+# def solution(words):
+#     root = Node()
+#     for word in words:
+#         node = root
+#         for char in word:
+#             if char in node.children:
+#                 next = node.children[char]
+#             else:
+#                 next = Node()
+#                 node.children[char] = next
+#             node = next
+#         node.is_word = True
+
+    # # 노드 활용 탐색방법 1
+    # # dfs방식으로 load == 1인 지점, is_word인 부분만 m을 추가시킴
+    # # O(M * N) 단어길이 M, 단어갯수 N
+    # sum = 0
+    # s = [[root, 0]]
+    # while s:
+    #     node, m = s.pop()
+    #     if len(node.children) == 1:
+    #         sum += m
+    #         continue
+    #
+    #     sum += m if node.is_word else 0
+    #
+    #     for key, next in node.children.items():
+    #         s.append([next, m + 1])
+    #
+    # return sum
+
+# 노드 활용 탐색방법 2
 # 모든 단어를 root에서부터 검사해내려나감
 # O(M * N) 단어길이 M, 단어갯수 N
 #     total = 0
@@ -59,23 +101,49 @@ def solution(words):
 # 두 탐색 방법의 성능이 거의 차이나지 않음
 
 
+# 노드 활용 탐색방법 3
+# Node를 사용해 children의 갯수를 이용해 비교
+# 1,2번과 성능 비슷함
 
-def solution(words):
-    answer = 0
-    words.sort()
-    for idx, word in enumerate(words):
-        res = 1
+# def solution(words):
+#     root = Node()
+#     for word in words:
+#         node = root
+#         for char in word:
+#             if char in node.children:
+#                 next = node.children[char]
+#             else:
+#                 next = Node()
+#                 node.children[char] = next
+#             node = next
+#         # node.children["end"] = Node()
+#         node.is_word = True
+#
+#     sum = 0
+#     for word in words:
+#         children = root.children
+#         duplicated_pos = 0
+#         for i, letter in enumerate(word):
+#             curr = children[letter]
+#
+#             # 자식이 여러개이거나 자식이 하나지만 여기가 단어의 마지막인 마지막 지점을 다음 인덱스를 duplicated_pos로 지정
+#             if len(curr.children) > 1 or curr.is_word and len(curr.children) > 0:
+#                 duplicated_pos = i + 1 # i는 letter의 인덱스, i + 1는 children의 인덱스
+#
+#             children = curr.children
+#
+#         if duplicated_pos == 0:
+#             sum += 1
+#             print(word, 1)
+#         elif duplicated_pos < len(word):
+#             sum += duplicated_pos + 1
+#             print(word, duplicated_pos + 1)
+#         elif duplicated_pos == len(word):
+#             sum += duplicated_pos
+#             print(word, duplicated_pos)
+#
+#     return sum
 
-        if idx > 0:
-            for i, char in enumerate(word):
-                res = max(res, i+1)
-                # 이전 단어가 현재 경로와 같은 길이이거나(이전단어가 여기서 끝났을 때), 이전단어의 현재위치와는 다를 때(트라이가 분기할 때) break
-                if len(words[idx-1]) == i or words[idx-1][i] != char: break
-        if idx+1 < len(words):
-            for i, char in enumerate(word):
-                res = max(res, i+1)
-                # 다음 단어가 현재 경로와 같은 길이이거나, 다음단어의 현재위치와는 다를 때(트라이가 분기할 때) break
-                if len(words[idx+1]) == i or words[idx+1][i] != char: break
-        answer += res
 
-    return answer
+
+print(solution(["word","war","warrior","world"])) # 15

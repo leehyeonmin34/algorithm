@@ -2,6 +2,7 @@ import collections
 
 # 노드를 활용해서 이것저것 시도해봤지만,
 # 그래프만으로 하는 게 노드 활용하는 것보다 성능 2배 좋음
+# defaultdict보다 그냥 dict가 성능 살-짝 더 좋은 것 같기도 함
 def solution(words):
 
     # 각 노드가 딕셔너리로서 표현되며,
@@ -10,13 +11,11 @@ def solution(words):
     DUP, END = "DUP", "END"
 
     # 트라이 그래프 생성
-    root = collections.defaultdict()
+    root = {}
     for word in words:
         curr = root
         for char in word:
-            if char not in curr:
-                curr[char] = collections.defaultdict()
-            curr = curr[char]
+            curr = curr.setdefault(char, {})
             curr[DUP] = 1 if DUP not in curr else curr[DUP] + 1
 
         curr[END] = True

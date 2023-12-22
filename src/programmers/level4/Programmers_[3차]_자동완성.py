@@ -23,6 +23,7 @@ def solution(words):
 
     # 탐색방법 1
     # dfs방식으로 load == 1인 지점, is_word인 부분만 m을 추가시킴
+    # O(M * N) 단어길이 M, 단어갯수 N
     sum = 0
     s = [[root, 0]]
     while s:
@@ -40,6 +41,7 @@ def solution(words):
 
 # 탐색방법 2
 # 모든 단어를 root에서부터 검사해내려나감
+# O(M * N) 단어길이 M, 단어갯수 N
 #     total = 0
 #     for word in words:
 #         node = root
